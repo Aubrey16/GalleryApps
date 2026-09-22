@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">GalleryApps</string>
+    <string name="gallery_Title">Galeri</string>
+    <string name="grant_permission">Beri Izin Nyan</string>
+    <string name="permission_required">Minta Izin Gng</string>
+    <string name="no_photos">Ga ada fotonya</string>
+    <string name="error_loading">Gagal memuat galeri :(</string>
 </resources>
