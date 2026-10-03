@@ -1,5 +1,6 @@
 package com.example.galleryapps
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
@@ -17,6 +18,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.galleryapps.data.GalleryImage
 import com.example.galleryapps.data.MediaRepository
 import com.example.galleryapps.data.PermissionHelper
 import com.example.galleryapps.databinding.ActivityMainBinding
@@ -32,8 +34,19 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: GalleryViewModel by viewModels()
 
     private val adapter = ImageGridAdapter { image ->
-        // Tahap 4: buka ViewerActivity dengan image ini
+        val position = currentImages.indexOfFirst { it.id == image.id }
+        if(position == -1)return@ImageGridAdapter
+        val intent = Intent(this, ViewerActivity::class.java).apply {
+            putParcelableArrayListExtra(
+                ViewerActivity.EXTRA_URIS,
+                ArrayList(currentImages.map { it.uri })
+            )
+            putExtra(ViewerActivity.EXTRA_POSITION, position)
+        }
+        startActivity(intent)
     }
+
+    private var currentImages: List<GalleryImage> = emptyList()
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -101,7 +114,11 @@ class MainActivity : AppCompatActivity() {
             if (state is GalleryUiState.Empty || state is GalleryUiState.Error) View.VISIBLE else View.GONE
 
         when (state) {
-            is GalleryUiState.Success -> adapter.submitList(state.images)
+            is GalleryUiState.Success -> {
+                currentImages = state.images
+                adapter.submitList(state.images)
+            (state.images)
+            }
             is GalleryUiState.Empty -> adapter.submitList(emptyList())
             is GalleryUiState.Error -> {
                 binding.textEmpty.text = state.message
