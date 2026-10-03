@@ -5,4 +5,5 @@
     <string name="permission_required">Minta Izin Gng</string>
     <string name="no_photos">Ga ada fotonya</string>
     <string name="error_loading">Gagal memuat galeri :(</string>
+    <string name="share">Bagikan</string>
 </resources>
