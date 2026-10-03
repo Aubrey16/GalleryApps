@@ -1,5 +1,6 @@
 package com.example.galleryapps
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -8,8 +9,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.galleryapps.data.GalleryImage
 import com.example.galleryapps.databinding.ActivityViewerBinding
 import com.example.galleryapps.ui.ViewerPagerAdapter
+import com.google.android.material.animation.Positioning
 
 class ViewerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityViewerBinding
@@ -63,5 +66,13 @@ class ViewerActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_URIS = "extra_uris"
         const val EXTRA_POSITION = "extra_position"
+
+        fun start(context: Context, images: List<GalleryImage>, position: Int){
+            val intent = Intent(context, ViewerActivity::class.java).apply {
+                putParcelableArrayListExtra(EXTRA_URIS, ArrayList(images.map { it.uri }))
+                putExtra(EXTRA_POSITION, position)
+            }
+            context.startActivity(intent)
+        }
     }
 }

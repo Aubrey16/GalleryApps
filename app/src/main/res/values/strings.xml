@@ -6,4 +6,7 @@
     <string name="no_photos">Ga ada fotonya</string>
     <string name="error_loading">Gagal memuat galeri :(</string>
     <string name="share">Bagikan</string>
+    <string name="folders">Folder</string>
+    <string name="no_folders">Belum ada foldernya sir</string>
+    <string name="photos_count">%1$d foto</string>
 </resources>

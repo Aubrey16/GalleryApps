@@ -35,15 +35,9 @@ class MainActivity : AppCompatActivity() {
 
     private val adapter = ImageGridAdapter { image ->
         val position = currentImages.indexOfFirst { it.id == image.id }
-        if(position == -1)return@ImageGridAdapter
-        val intent = Intent(this, ViewerActivity::class.java).apply {
-            putParcelableArrayListExtra(
-                ViewerActivity.EXTRA_URIS,
-                ArrayList(currentImages.map { it.uri })
-            )
-            putExtra(ViewerActivity.EXTRA_POSITION, position)
+        if(position == -1){
+            ViewerActivity.start(this, currentImages, position)
         }
-        startActivity(intent)
     }
 
     private var currentImages: List<GalleryImage> = emptyList()
@@ -68,6 +62,16 @@ class MainActivity : AppCompatActivity() {
 
         applyInsets()
         setupRecyclerView()
+        binding.Toolbar.inflateMenu(R.menu.menu_main)
+        binding.Toolbar.setOnMenuItemClickListener { item ->
+            if (item.itemId == R.id.action_folder){
+                startActivity(Intent(this, FolderActivity::class.java))
+                true
+            }else{
+                false
+            }
+        }
+
         observeState()
 
         binding.buttonGrant.setOnClickListener {
