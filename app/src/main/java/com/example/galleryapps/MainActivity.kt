@@ -18,6 +18,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.galleryapps.archive.ArchiveActivity
 import com.example.galleryapps.data.GalleryImage
 import com.example.galleryapps.data.MediaRepository
 import com.example.galleryapps.data.PermissionHelper
@@ -35,15 +36,9 @@ class MainActivity : AppCompatActivity() {
 
     private val adapter = ImageGridAdapter { image ->
         val position = currentImages.indexOfFirst { it.id == image.id }
-        if(position == -1)return@ImageGridAdapter
-        val intent = Intent(this, ViewerActivity::class.java).apply {
-            putParcelableArrayListExtra(
-                ViewerActivity.EXTRA_URIS,
-                ArrayList(currentImages.map { it.uri })
-            )
-            putExtra(ViewerActivity.EXTRA_POSITION, position)
+        if(position == -1){
+            ViewerActivity.start(this, currentImages, position)
         }
-        startActivity(intent)
     }
 
     private var currentImages: List<GalleryImage> = emptyList()
@@ -58,6 +53,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val openArchiveLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            ArchiveActivity.start(this, uri.toString())
+        }
+    }
+
+
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,6 +73,22 @@ class MainActivity : AppCompatActivity() {
 
         applyInsets()
         setupRecyclerView()
+
+        binding.Toolbar.inflateMenu(R.menu.menu_main)
+        binding.Toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_folder -> {
+                    startActivity(Intent(this, FolderActivity::class.java))
+                    true
+                }
+                R.id.action_open_archive -> {
+                    openArchiveLauncher.launch(arrayOf("*/*"))
+                    true
+                }
+                else -> false
+            }
+        }
+
         observeState()
 
         binding.buttonGrant.setOnClickListener {

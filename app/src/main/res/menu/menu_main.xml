@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_folder"
+        android:title="@string/folders"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/action_open_archive"
+        android:title="@string/open_archive"
+        app:showAsAction="never" />
+
+
+</menu>

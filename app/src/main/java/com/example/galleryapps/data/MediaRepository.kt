@@ -7,8 +7,38 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class MediaRepository(private val context: Context) {
-    suspend fun loadImages(): List<GalleryImage> = withContext(Dispatchers.IO){
+
+    suspend fun loadImages(): List<GalleryImage> = withContext(Dispatchers.IO) {
+        queryImages("${MediaStore.Images.Media.SIZE} > 0", null)
+    }
+
+    suspend fun loadImagesInBucket(bucketId: Long): List<GalleryImage> =
+        withContext(Dispatchers.IO) {
+            queryImages(
+                "${MediaStore.Images.Media.BUCKET_ID} = ?",
+                arrayOf(bucketId.toString())
+            )
+        }
+
+    suspend fun loadBuckets(): List<Bucket> {
+        val images = loadImages()
+        return images
+            .groupBy { it.bucketId }
+            .map { (bucketId, items) ->
+                val newest = items.first()
+                Bucket(
+                    id = bucketId,
+                    name = newest.bucketName,
+                    imageCount = items.size,
+                    coverUri = newest.uri
+                )
+            }
+            .sortedByDescending { it.imageCount }
+    }
+
+    private fun queryImages(selection: String?, selectionArgs: Array<String>?): List<GalleryImage> {
         val images = mutableListOf<GalleryImage>()
+
         val projection = arrayOf(
             MediaStore.Images.Media._ID,
             MediaStore.Images.Media.DISPLAY_NAME,
@@ -20,15 +50,13 @@ class MediaRepository(private val context: Context) {
             MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
             MediaStore.Images.Media.MIME_TYPE
         )
-
-        val selection = "${MediaStore.Images.Media.SIZE} > 0"
         val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
 
         context.contentResolver.query(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             projection,
             selection,
-            null,
+            selectionArgs,
             sortOrder
         )?.use { cursor ->
             val idCol = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
@@ -44,8 +72,7 @@ class MediaRepository(private val context: Context) {
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idCol)
                 val uri = ContentUris.withAppendedId(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    id
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id
                 )
                 images += GalleryImage(
                     id = id,
@@ -61,22 +88,6 @@ class MediaRepository(private val context: Context) {
                 )
             }
         }
-        images
-    }
-
-    suspend fun loadBuckets(): List<Bucket>{
-        val images = loadImages()
         return images
-            .groupBy { it.bucketId }
-            .map { (bucketId, items) ->
-                val newest = items.first()
-                Bucket(
-                    id = bucketId,
-                    name = newest.bucketName,
-                    imageCount = items.size,
-                    coverUri = newest.uri
-                )
-            }
-            .sortedByDescending { it.imageCount }
     }
 }
