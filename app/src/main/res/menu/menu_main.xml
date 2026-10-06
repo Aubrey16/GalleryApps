@@ -5,5 +5,10 @@
         android:title="@string/folders"
         app:showAsAction="never"
         />
+    <item
+        android:id="@+id/action_open_archive"
+        android:title="@string/open_archive"
+        app:showAsAction="never" />
+
 
 </menu>

@@ -18,6 +18,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.galleryapps.archive.ArchiveActivity
 import com.example.galleryapps.data.GalleryImage
 import com.example.galleryapps.data.MediaRepository
 import com.example.galleryapps.data.PermissionHelper
@@ -52,6 +53,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val openArchiveLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            ArchiveActivity.start(this, uri.toString())
+        }
+    }
+
+
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,13 +73,19 @@ class MainActivity : AppCompatActivity() {
 
         applyInsets()
         setupRecyclerView()
+
         binding.Toolbar.inflateMenu(R.menu.menu_main)
         binding.Toolbar.setOnMenuItemClickListener { item ->
-            if (item.itemId == R.id.action_folder){
-                startActivity(Intent(this, FolderActivity::class.java))
-                true
-            }else{
-                false
+            when (item.itemId) {
+                R.id.action_folder -> {
+                    startActivity(Intent(this, FolderActivity::class.java))
+                    true
+                }
+                R.id.action_open_archive -> {
+                    openArchiveLauncher.launch(arrayOf("*/*"))
+                    true
+                }
+                else -> false
             }
         }
 

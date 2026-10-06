@@ -41,6 +41,15 @@
             android:exported="false"
             android:theme="@style/Base.Theme.GalleryApps"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".archive.ArchiveActivity"
+            android:exported="false"
+            android:theme="@style/Theme.GalleryApps"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".archive.ArchiveViewerActivity"
+            android:exported="false"
+            android:theme="@style/Theme.GalleryApps" />
     </application>
 
 </manifest>
